@@ -8,12 +8,6 @@ public class TestCalculator {
 
         Scanner scn = new Scanner(System.in);
 
-        int number;
-        int maxNumber = 9999;
-        int maxInputNumber;
-        boolean isSeven;
-        int numberLeft;
-
         Calculator sevenCalculator = new Calculator();
 
         sevenCalculator.readUpperLimit();
