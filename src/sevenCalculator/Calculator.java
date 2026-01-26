@@ -10,6 +10,8 @@ public class Calculator {
         int number;
         int maxNumber = 9999;
         int maxInputNumber;
+        boolean isSeven;
+        int numberLeft;
 
         void readUpperLimit() {
             System.out.println("Enter the upper limit (max " + maxNumber + "):");
@@ -21,18 +23,27 @@ public class Calculator {
         }
 
         void outputSeven(){
-            boolean seven;
-            int number = 1;
-            int numberLeft;
-
-            for (int i = 0; i <= maxInputNumber; i++) {
-                int result = calculateSeven(i);
-                System.out.println("Input: " + i + " -> Result: " + result);
+            while (number <= maxNumber) {
+                isSeven = false;
+                numberLeft = number;
+                while (numberLeft > 0) {
+                    if (numberLeft % 10 == 7) {
+                        isSeven = true;
+                    }
+                    numberLeft = numberLeft / 10;
+                }
+            }
+            if (isSeven) { // TODO: Replace with check if number is seven.
+                isSeven = true;
+            }
+            if (isSeven) {
+                System.out.println(number);
+                System.out.println("This is a seven.");
+            }
+            else {
+                System.out.println(number);
+                System.out.println("This is not a seven.");
             }
         }
-    }
-
-    int calculateSeven(int number) {
-        return number + 7;
     }
 }

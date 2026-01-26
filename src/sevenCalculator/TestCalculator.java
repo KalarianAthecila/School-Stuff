@@ -1,5 +1,6 @@
 package sevenCalculator;
 
+
 import java.util.Scanner;
 
 public class TestCalculator {
@@ -8,13 +9,15 @@ public class TestCalculator {
         Scanner scn = new Scanner(System.in);
 
         int number;
+        int maxNumber = 9999;
+        int maxInputNumber;
+        boolean isSeven;
+        int numberLeft;
 
-        Calculator calculator = new Calculator();
+        Calculator sevenCalculator = new Calculator();
 
-        System.out.println("Enter a number:");
-        number = scn.nextInt();
+        sevenCalculator.readUpperLimit();
+        sevenCalculator.outputSeven();
 
-        int result = calculator.calculateSeven(number);
-        System.out.println("Result: " + result);
     }
 }
