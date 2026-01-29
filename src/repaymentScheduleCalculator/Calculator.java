@@ -1,7 +1,15 @@
 package repaymentScheduleCalculator;
 
+import java.util.Scanner;
+
 public class Calculator {
+    double loanAmount;
+    double interestRate;
+    double monthlyInstallment;
+
     /*
+    EXAMPLE INPUT AND OUTPUT:
+
     Please enter your credit details:
     Loan amount (Euro): 10,000
     Interest rate: 10%
@@ -31,6 +39,61 @@ public class Calculator {
     The loan term was 11 months
     Total interest: 485.85 Euro
     */
-    void inputData (){};
-    void calculateData (){};
+    void inputData() {
+        // Input all the necessary data.
+        Scanner scn = new Scanner(System.in);
+        System.out.println("Please enter your credit details:");
+        System.out.print("Loan amount (Euro): ");
+        loanAmount = scn.nextDouble();
+        System.out.print("Interest rate (%): ");
+        interestRate = scn.nextDouble();
+        System.out.print("Monthly installment (Euro): ");
+        monthlyInstallment = scn.nextDouble();
+    }
+
+    void calculateData() {
+        // Begin to output the table.
+        System.out.println();
+        System.out.printf("Loan amount: %.2f Euro%n", loanAmount);
+        System.out.printf("Monthly installment amount: %.2f Euro%n", monthlyInstallment);
+        System.out.printf("Interest rate in percent: %.2f%%%n", interestRate);
+        System.out.println();
+        System.out.println("Repayment schedule");
+        System.out.println("------------------------------------------------------");
+        System.out.println("Month  Remaining loan  Monthly rate  Repayment  Interest");
+        System.out.println("------------------------------------------------------");
+
+        // Calculate the remaining values.
+        double remainingLoan = loanAmount;
+        double totalInterest = 0.0;
+        int month = 1;
+
+        while (remainingLoan > 0.01) {
+            double interest = remainingLoan * (interestRate / 100) / 12;
+            double repayment = Math.min(monthlyInstallment - interest, remainingLoan);
+            double monthlyRate = repayment + interest;
+            if (repayment < 0) repayment = 0;
+            if (monthlyRate > remainingLoan + interest) monthlyRate = remainingLoan + interest;
+
+            System.out.printf("%-6d %-15.2f %-13.2f %-10.2f %.2f%n",
+                    month, remainingLoan, monthlyRate, repayment, interest);
+
+            remainingLoan -= repayment;
+            totalInterest += interest;
+            month++;
+
+            if (remainingLoan < 0.01) {
+                break;
+            }
+            // If the last payment is less than the monthly installment, adjust for the last month
+            if (remainingLoan + interest < monthlyInstallment) {
+                monthlyInstallment = remainingLoan + interest;
+            }
+        }
+
+        // Output the remaining values into the table.
+        System.out.println();
+        System.out.printf("The loan term was %d months%n", month - 1);
+        System.out.printf("Total interest: %.2f Euro%n", totalInterest);
+    }
 }

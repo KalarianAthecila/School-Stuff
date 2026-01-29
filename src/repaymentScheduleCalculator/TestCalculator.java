@@ -1,6 +1,6 @@
 package repaymentScheduleCalculator;
 
-import sevenCalculator.Calculator;
+import repaymentScheduleCalculator.Calculator;
 
 public class TestCalculator {
     public static void main(String[] args) {
