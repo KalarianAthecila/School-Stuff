@@ -75,6 +75,7 @@ public class Calculator {
             if (repayment < 0) repayment = 0;
             if (monthlyRate > remainingLoan + interest) monthlyRate = remainingLoan + interest;
 
+            // We printin'
             System.out.printf("%-6d %-15.2f %-13.2f %-10.2f %.2f%n",
                     month, remainingLoan, monthlyRate, repayment, interest);
 
