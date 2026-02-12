@@ -17,7 +17,7 @@ public class Calculator {
     double yMovement;
     double time;
     double gravity = 9.81f;
-    double alpha; //NOT "alfa", that's not correct language lol.
+    double alpha; // NOT "alfa", that's not correct language lol.
 
     public void inputData(){
         System.out.println("Input throw height, throw angle and throw speed:");
