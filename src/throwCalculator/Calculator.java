@@ -17,11 +17,16 @@ public class Calculator {
     double yMovement;
     double time;
     double gravity = 9.81f;
-    double alpha;
+    double alpha; //NOT "alfa", that's not correct language lol.
 
     public void inputData(){
+        System.out.println("Input throw height, throw angle and throw speed:");
+        System.out.println("-----------------------------------");
+        System.out.println("Input throw height:");
         throwHeight = scn.nextDouble(); // Default: 10 meters
+        System.out.println("Input throw angle:");
         throwAngle = scn.nextDouble(); // Default: 45 degrees
+        System.out.println("Input throw speed:");
         v0 = scn.nextDouble(); // Default: 12 m/s
     }
 
