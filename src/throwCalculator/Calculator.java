@@ -31,15 +31,16 @@ public class Calculator {
     }
 
     public void showThrowingData(){
-        while (x > 0){
+        while (x > 0.1){
             // calculate x
-            xMovement = v0 * Math.cos(alpha) * time;
+            xMovement = throwSpeed * Math.cos(alpha) * time;
             // calculate y
-            yMovement = v0 * Math.sin(alpha) * time - gravity / 2 * Math.pow(time, 2);
+            yMovement =throwSpeed * Math.sin(alpha) * time - gravity / 2 * Math.pow(time, 2);
             // check if at max height
             // output x and y
             System.out.println("Time: " + time + "X: " + x + "y: " + y);
             // increase time
+            time += 1;
         // output time, max height and range
         }
     }
