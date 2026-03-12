@@ -26,7 +26,7 @@ public class Calculator {
         System.out.println("Input throw angle:");
         throwAngle = scn.nextDouble(); // Default: 45 degrees
         System.out.println("Input throw speed:");
-        v0 = scn.nextDouble(); // Default: 12 m/s
+        throwSpeed = scn.nextDouble(); // Default: 12 m/s
     }
 
     public void showThrowingData(){
