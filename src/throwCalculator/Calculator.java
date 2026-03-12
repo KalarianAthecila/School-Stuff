@@ -7,16 +7,15 @@ public class Calculator {
     // Math.toRadians();
     // Math.toDegrees();
 
-    double throwHeight;
-    double throwAngle;
-    double throwSpeed;
-    double v0;
-    double x;
-    double y;
-    double xMovement;
-    double yMovement;
-    double time;
-    double gravity = 9.81f;
+    double throwHeight; // This is the height from which the throw is made. It can also be 0 if the throw is made from the ground.
+    double throwAngle; // This is the angle of the throw.
+    double throwSpeed; // This is the initial speed of the throw
+    double x; // This is the distance of the throw on the x axis at a given time.
+    double y; // This is the height of the hrow at a given time.
+    double xMovement; // This is the movement of the throw on the x axis.
+    double yMovement; // This is the movement of the throw on the y axis.
+    double time; // This is the time that has passed since the throw, in seconds. It starts at 0 and increases by 1 every loop until the throw is finished.
+    double gravity = 9.81f; // This is earth gravity, rounded to a general value that roughly applies everywhere one arth.
     double alpha; // NOT "alfa", that's not correct language lol.
 
     public void inputData(){
