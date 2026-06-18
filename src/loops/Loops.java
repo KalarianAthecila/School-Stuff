@@ -26,5 +26,9 @@ public class Loops {
         test.triangle4(4);
         test.lf();
         test.triangle5(4);
+        test.lf();
+        test.hourglass(9);
+        test.lf();
+        test.rotatedSquare(5);
     }
 }

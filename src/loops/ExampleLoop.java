@@ -111,4 +111,26 @@ public class ExampleLoop {
             System.out.println();
         }
     }
+
+    public void hourglass(int layerCount) {
+        for (int i = 0; i < layerCount; i++) {
+            int spaces = Math.min(i, layerCount - 1 - i);
+            int hashes = layerCount - 2 * spaces;
+            for (int j = 0; j < spaces; j++) System.out.print(" ");
+            for (int j = 0; j < hashes; j++) System.out.print("#");
+            System.out.println();
+        }
+    }
+
+
+    public void rotatedSquare(int layerCount) {
+        for (int i = 0; i < layerCount; i++) {
+            int spaces = Math.abs(i - (layerCount - 1) / 2);
+            int hashes = layerCount - 2 * spaces;
+            for (int j = 0; j < spaces; j++) System.out.print(" ");
+            for (int j = 0; j < hashes; j++) System.out.print("#");
+            System.out.println();
+        }
+    }
+
 }
