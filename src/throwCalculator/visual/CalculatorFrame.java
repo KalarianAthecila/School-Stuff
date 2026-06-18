@@ -1,4 +1,4 @@
-package throwCalculatorAllOverAgain;
+package throwCalculator.visual;
 
 import javax.swing.*;
 

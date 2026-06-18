@@ -1,4 +1,4 @@
-package throwCalculator;
+package throwCalculator.cli;
 
 import java.util.Scanner;
 
