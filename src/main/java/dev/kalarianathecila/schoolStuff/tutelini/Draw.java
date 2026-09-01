@@ -39,19 +39,27 @@ public class Draw extends JFrame {
         }
 
         JTextField scaleField = new JTextField(String.valueOf(argScale != null ? argScale : 1), 8);
-        JCheckBox houseCheck = new JCheckBox("Use value for house scale", argTarget == MainPanel.DrawingTarget.HOUSE);
-        JCheckBox treeCheck = new JCheckBox("Use value for tree levels", argTarget == MainPanel.DrawingTarget.TREE);
+        JCheckBox houseCheck = new JCheckBox("House (value = scale)", argTarget == MainPanel.DrawingTarget.HOUSE);
+        JCheckBox treeCheck = new JCheckBox("Tree (value = levels)", argTarget == MainPanel.DrawingTarget.TREE);
 
         ButtonGroup group = new ButtonGroup();
         group.add(houseCheck);
         group.add(treeCheck);
 
+        JPanel standardPanel = new JPanel(new GridLayout(0, 1, 0, 4));
+        standardPanel.setBorder(BorderFactory.createTitledBorder("Standard"));
+        standardPanel.add(houseCheck);
+
+        JPanel fractalPanel = new JPanel(new GridLayout(0, 1, 0, 4));
+        fractalPanel.setBorder(BorderFactory.createTitledBorder("Fractals"));
+        fractalPanel.add(treeCheck);
+
         JPanel panel = new JPanel(new GridLayout(0, 1, 0, 6));
         panel.add(new JLabel("Enter value (positive integer):"));
         panel.add(scaleField);
-        panel.add(new JLabel("Apply scale to:"));
-        panel.add(houseCheck);
-        panel.add(treeCheck);
+        panel.add(new JLabel("Apply value to:"));
+        panel.add(standardPanel);
+        panel.add(fractalPanel);
 
         while (true) {
             int result = JOptionPane.showConfirmDialog(
