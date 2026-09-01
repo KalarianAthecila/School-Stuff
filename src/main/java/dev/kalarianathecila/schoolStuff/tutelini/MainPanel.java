@@ -3,15 +3,26 @@ package dev.kalarianathecila.schoolStuff.tutelini;
 import java.awt.*;
 
 public class MainPanel extends Panel {
+    public enum DrawingTarget {
+        HOUSE,
+        TREE
+    }
+
     private Turtle tutel = null;
     private final int scale;
+    private final DrawingTarget drawingTarget;
 
     public MainPanel() {
-        this(1);
+        this(1, DrawingTarget.HOUSE);
     }
 
     public MainPanel(int scale) {
+        this(scale, DrawingTarget.HOUSE);
+    }
+
+    public MainPanel(int scale, DrawingTarget drawingTarget) {
         this.scale = Math.max(1, scale);
+        this.drawingTarget = drawingTarget == null ? DrawingTarget.HOUSE : drawingTarget;
     }
 
     @Override
@@ -19,7 +30,11 @@ public class MainPanel extends Panel {
         super.paint(g);
 
         this.tutel = new Turtle(this, g);
-        drawHouseOfNicholas(scale);
+        if (drawingTarget == DrawingTarget.TREE) {
+            drawTree(scale);
+        } else {
+            drawHouseOfNicholas(scale);
+        }
     }
 
     public void draw() {
@@ -60,5 +75,9 @@ public class MainPanel extends Panel {
 
         tutel.turnLeft(133);
         tutel.move(150 * normalizedScale);
+    }
+
+    public void drawTree(int inputScale) {
+        // Placeholder for upcoming tree implementation.
     }
 }
