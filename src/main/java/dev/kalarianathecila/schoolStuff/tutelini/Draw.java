@@ -41,10 +41,16 @@ public class Draw extends JFrame {
         JTextField scaleField = new JTextField(String.valueOf(argScale != null ? argScale : 1), 8);
         JCheckBox houseCheck = new JCheckBox("House (value = scale)", argTarget == MainPanel.DrawingTarget.HOUSE);
         JCheckBox treeCheck = new JCheckBox("Tree (value = levels)", argTarget == MainPanel.DrawingTarget.TREE);
+        JCheckBox kochCheck = new JCheckBox("Koch Snowflake (value = levels)", argTarget == MainPanel.DrawingTarget.KOCH_SNOWFLAKE);
+        JCheckBox sierpinskiCheck = new JCheckBox("Sierpinski Triangle (value = levels)", argTarget == MainPanel.DrawingTarget.SIERPINSKI_TRIANGLE);
+        JCheckBox dragonCheck = new JCheckBox("Dragon Curve (value = levels)", argTarget == MainPanel.DrawingTarget.DRAGON_CURVE);
 
         ButtonGroup group = new ButtonGroup();
         group.add(houseCheck);
         group.add(treeCheck);
+        group.add(kochCheck);
+        group.add(sierpinskiCheck);
+        group.add(dragonCheck);
 
         JPanel standardPanel = new JPanel(new GridLayout(0, 1, 0, 4));
         standardPanel.setBorder(BorderFactory.createTitledBorder("Standard"));
@@ -53,10 +59,14 @@ public class Draw extends JFrame {
         JPanel fractalPanel = new JPanel(new GridLayout(0, 1, 0, 4));
         fractalPanel.setBorder(BorderFactory.createTitledBorder("Fractals"));
         fractalPanel.add(treeCheck);
+        fractalPanel.add(kochCheck);
+        fractalPanel.add(sierpinskiCheck);
+        fractalPanel.add(dragonCheck);
 
         JPanel panel = new JPanel(new GridLayout(0, 1, 0, 6));
         panel.add(new JLabel("Enter value (positive integer):"));
         panel.add(scaleField);
+        panel.add(new JLabel("Fractals use level caps for stability (tree 12, koch 6, sierpinski 7, dragon 16)."));
         panel.add(new JLabel("Apply value to:"));
         panel.add(standardPanel);
         panel.add(fractalPanel);
@@ -87,6 +97,12 @@ public class Draw extends JFrame {
 
             MainPanel.DrawingTarget target = treeCheck.isSelected()
                     ? MainPanel.DrawingTarget.TREE
+                    : kochCheck.isSelected()
+                    ? MainPanel.DrawingTarget.KOCH_SNOWFLAKE
+                    : sierpinskiCheck.isSelected()
+                    ? MainPanel.DrawingTarget.SIERPINSKI_TRIANGLE
+                    : dragonCheck.isSelected()
+                    ? MainPanel.DrawingTarget.DRAGON_CURVE
                     : MainPanel.DrawingTarget.HOUSE;
 
             return new DrawSelection(parsedScale, target);
@@ -114,6 +130,15 @@ public class Draw extends JFrame {
         String normalized = value.trim().toLowerCase();
         if ("tree".equals(normalized)) {
             return MainPanel.DrawingTarget.TREE;
+        }
+        if ("koch".equals(normalized) || "snowflake".equals(normalized) || "koch_snowflake".equals(normalized)) {
+            return MainPanel.DrawingTarget.KOCH_SNOWFLAKE;
+        }
+        if ("sierpinski".equals(normalized) || "triangle".equals(normalized) || "sierpinski_triangle".equals(normalized)) {
+            return MainPanel.DrawingTarget.SIERPINSKI_TRIANGLE;
+        }
+        if ("dragon".equals(normalized) || "dragon_curve".equals(normalized)) {
+            return MainPanel.DrawingTarget.DRAGON_CURVE;
         }
 
         return MainPanel.DrawingTarget.HOUSE;

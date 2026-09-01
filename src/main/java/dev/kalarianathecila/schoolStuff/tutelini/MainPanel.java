@@ -3,9 +3,17 @@ package dev.kalarianathecila.schoolStuff.tutelini;
 import java.awt.*;
 
 public class MainPanel extends Panel {
+    private static final int MAX_TREE_LEVELS = 12;
+    private static final int MAX_KOCH_LEVELS = 6;
+    private static final int MAX_SIERPINSKI_LEVELS = 7;
+    private static final int MAX_DRAGON_LEVELS = 16;
+
     public enum DrawingTarget {
         HOUSE,
-        TREE
+        TREE,
+        KOCH_SNOWFLAKE,
+        SIERPINSKI_TRIANGLE,
+        DRAGON_CURVE
     }
 
     private Turtle tutel = null;
@@ -30,10 +38,22 @@ public class MainPanel extends Panel {
         super.paint(g);
 
         this.tutel = new Turtle(this, g);
-        if (drawingTarget == DrawingTarget.TREE) {
-            drawTree(scale);
-        } else {
-            drawHouseOfNicholas(scale);
+        switch (drawingTarget) {
+            case TREE:
+                drawTree(scale);
+                break;
+            case KOCH_SNOWFLAKE:
+                drawKochSnowflake(scale);
+                break;
+            case SIERPINSKI_TRIANGLE:
+                drawSierpinskiTriangle(scale);
+                break;
+            case DRAGON_CURVE:
+                drawDragonCurve(scale);
+                break;
+            default:
+                drawHouseOfNicholas(scale);
+                break;
         }
     }
 
@@ -72,7 +92,7 @@ public class MainPanel extends Panel {
     }
 
     public void drawTree(int inputScale) {
-        int levels = Math.max(1, inputScale);
+        int levels = clampLevel(inputScale, MAX_TREE_LEVELS);
 
         int panelHeight = Math.max(200, getHeight());
         int bottomMargin = 40;
@@ -119,5 +139,125 @@ public class MainPanel extends Panel {
 
         // Restore original heading before returning.
         tutel.turnLeft(30);
+    }
+
+    public void drawKochSnowflake(int inputLevels) {
+        int levels = clampLevel(inputLevels, MAX_KOCH_LEVELS);
+        double size = Math.min(getWidth(), getHeight()) * 0.35;
+        if (size < 80) {
+            size = 220;
+        }
+
+        tutel.homePosition();
+        tutel.stopDraw();
+        tutel.back((int) Math.round(size / 2.0));
+        tutel.turnRight(90);
+        tutel.move(size / 3.0);
+        tutel.turnLeft(90);
+        tutel.startDraw();
+
+        for (int i = 0; i < 3; i++) {
+            drawKochSegment(levels, size);
+            tutel.turnRight(120);
+        }
+    }
+
+    private void drawKochSegment(int level, double length) {
+        if (level <= 1) {
+            tutel.move(length);
+            return;
+        }
+
+        double third = length / 3.0;
+        drawKochSegment(level - 1, third);
+        tutel.turnLeft(60);
+        drawKochSegment(level - 1, third);
+        tutel.turnRight(120);
+        drawKochSegment(level - 1, third);
+        tutel.turnLeft(60);
+        drawKochSegment(level - 1, third);
+    }
+
+    public void drawSierpinskiTriangle(int inputLevels) {
+        int levels = clampLevel(inputLevels, MAX_SIERPINSKI_LEVELS);
+        double size = Math.min(getWidth(), getHeight()) * 0.6;
+        if (size < 100) {
+            size = 260;
+        }
+
+        tutel.homePosition();
+        tutel.stopDraw();
+        tutel.back((int) Math.round(size / 2.0));
+        tutel.turnRight(90);
+        tutel.move(size / 3.0);
+        tutel.turnLeft(90);
+        tutel.startDraw();
+
+        drawSierpinskiRecursive(levels, size);
+    }
+
+    private void drawSierpinskiRecursive(int level, double length) {
+        if (level <= 1) {
+            drawTriangle(length);
+            return;
+        }
+
+        double half = length / 2.0;
+
+        drawSierpinskiRecursive(level - 1, half);
+
+        tutel.move(half);
+        drawSierpinskiRecursive(level - 1, half);
+        tutel.back((int) Math.round(half));
+
+        tutel.turnLeft(60);
+        tutel.move(half);
+        tutel.turnRight(60);
+        drawSierpinskiRecursive(level - 1, half);
+        tutel.turnRight(60);
+        tutel.back((int) Math.round(half));
+        tutel.turnLeft(60);
+    }
+
+    private void drawTriangle(double length) {
+        for (int i = 0; i < 3; i++) {
+            tutel.move(length);
+            tutel.turnLeft(120);
+        }
+    }
+
+    public void drawDragonCurve(int inputLevels) {
+        int levels = clampLevel(inputLevels, MAX_DRAGON_LEVELS);
+        double size = Math.min(getWidth(), getHeight()) * 0.45;
+        if (size < 80) {
+            size = 220;
+        }
+
+        tutel.homePosition();
+        tutel.stopDraw();
+        tutel.back((int) Math.round(size / 2.0));
+        tutel.startDraw();
+
+        drawDragonRecursive(levels, size, 1);
+    }
+
+    private void drawDragonRecursive(int level, double length, int sign) {
+        if (level <= 1) {
+            tutel.move(length);
+            return;
+        }
+
+        double nextLength = length / Math.sqrt(2.0);
+        drawDragonRecursive(level - 1, nextLength, 1);
+        if (sign > 0) {
+            tutel.turnLeft(90);
+        } else {
+            tutel.turnRight(90);
+        }
+        drawDragonRecursive(level - 1, nextLength, -1);
+    }
+
+    private int clampLevel(int input, int maxLevel) {
+        return Math.min(maxLevel, Math.max(1, input));
     }
 }
