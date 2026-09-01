@@ -39,15 +39,15 @@ public class Draw extends JFrame {
         }
 
         JTextField scaleField = new JTextField(String.valueOf(argScale != null ? argScale : 1), 8);
-        JCheckBox houseCheck = new JCheckBox("Use scale for house", argTarget == MainPanel.DrawingTarget.HOUSE);
-        JCheckBox treeCheck = new JCheckBox("Use scale for tree", argTarget == MainPanel.DrawingTarget.TREE);
+        JCheckBox houseCheck = new JCheckBox("Use value for house scale", argTarget == MainPanel.DrawingTarget.HOUSE);
+        JCheckBox treeCheck = new JCheckBox("Use value for tree levels", argTarget == MainPanel.DrawingTarget.TREE);
 
         ButtonGroup group = new ButtonGroup();
         group.add(houseCheck);
         group.add(treeCheck);
 
         JPanel panel = new JPanel(new GridLayout(0, 1, 0, 6));
-        panel.add(new JLabel("Enter scale factor (positive integer):"));
+        panel.add(new JLabel("Enter value (positive integer):"));
         panel.add(scaleField);
         panel.add(new JLabel("Apply scale to:"));
         panel.add(houseCheck);
@@ -70,8 +70,8 @@ public class Draw extends JFrame {
             if (parsedScale == null) {
                 JOptionPane.showMessageDialog(
                         null,
-                        "Please enter a positive integer for scale.",
-                        "Invalid Scale",
+                        "Please enter a positive integer.",
+                        "Invalid Value",
                         JOptionPane.WARNING_MESSAGE
                 );
                 continue;

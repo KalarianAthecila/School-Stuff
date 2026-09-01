@@ -6,7 +6,7 @@ class Turtle
 {
   protected double posX, posY;        // Current position of the turtle
   protected double angle;            // Current looking direction
-  protected Color color =Color.blue;  // Default drawing color
+  protected Color color =Color.white;  // Default drawing color
   protected Container c;             // Container
   protected double homeX, homeY;      // Home coordinates
   protected boolean draw;
