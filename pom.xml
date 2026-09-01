@@ -17,28 +17,20 @@
         <maven.compiler.release>21</maven.compiler.release>
     </properties>
 
-    <build>
-        <sourceDirectory>src</sourceDirectory>
-        <resources>
-            <resource>
-                <directory>src</directory>
-                <includes>
-                    <include>**/*.png</include>
-                </includes>
-            </resource>
-        </resources>
+    <dependencies>
+        <dependency>
+            <groupId>com.formdev</groupId>
+            <artifactId>flatlaf</artifactId>
+            <version>3.5.4</version>
+        </dependency>
+    </dependencies>
 
+    <build>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.13.0</version>
-                <configuration>
-                    <!-- Compile only tutelini for now so unrelated school exercises do not break the build. -->
-                    <includes>
-                        <include>dev/kalarianathecila/schoolStuff/tutelini/**/*.java</include>
-                    </includes>
-                </configuration>
             </plugin>
 
             <plugin>
@@ -52,4 +44,3 @@
         </plugins>
     </build>
 </project>
-
