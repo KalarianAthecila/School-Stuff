@@ -3,9 +3,25 @@ package dev.kalarianathecila.schoolStuff.tutelini;
 import javax.swing.*;
 import java.awt.*;
 import java.net.URL;
+import java.util.concurrent.ThreadLocalRandom;
 import com.formdev.flatlaf.FlatDarkLaf;
 
 public class Draw extends JFrame {
+    private static final int MIN_SPIN_DELAY_MS = 20_000;
+    private static final int MAX_SPIN_DELAY_MS = 60_000;
+    private static final int SPIN_FRAME_DELAY_MS = 180;
+    private static final String[] TURTLE_ICON_PATHS = {
+            "/dev/kalarianathecila/schoolStuff/tutelini/tutel.png",
+            "/dev/kalarianathecila/schoolStuff/tutelini/tutel_90.png",
+            "/dev/kalarianathecila/schoolStuff/tutelini/tutel_180.png",
+            "/dev/kalarianathecila/schoolStuff/tutelini/tutel_270.png"
+    };
+
+    private Image[] turtleIcons;
+    private int currentIconIndex;
+    private int loadedIconCount;
+    private boolean isSpinning;
+
     public static void main(String[] args) {
         FlatDarkLaf.setup();
         DrawSelection selection = readSelection(args);
@@ -16,14 +32,87 @@ public class Draw extends JFrame {
             app.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             app.setSize(1920, 1080);
 
-            URL iconUrl = Draw.class.getResource("/dev/kalarianathecila/schoolStuff/tutelini/tutel.png");
-            if (iconUrl != null) {
-                app.setIconImage(new ImageIcon(iconUrl).getImage());
-            }
+            app.initializeIconRotation();
 
             app.add(new MainPanel(selection.scale, selection.target));
             app.setVisible(true);
+            app.scheduleNextIconSpin();
         });
+    }
+
+    private void initializeIconRotation() {
+        this.turtleIcons = new Image[TURTLE_ICON_PATHS.length];
+
+        for (int i = 0; i < TURTLE_ICON_PATHS.length; i++) {
+            URL iconUrl = Draw.class.getResource(TURTLE_ICON_PATHS[i]);
+            if (iconUrl != null) {
+                turtleIcons[i] = new ImageIcon(iconUrl).getImage();
+            }
+        }
+
+        loadedIconCount = 0;
+        for (Image turtleIcon : turtleIcons) {
+            if (turtleIcon != null) {
+                loadedIconCount++;
+            }
+        }
+
+        currentIconIndex = 0;
+        isSpinning = false;
+        if (turtleIcons[currentIconIndex] != null) {
+            setIconImage(turtleIcons[currentIconIndex]);
+        }
+    }
+
+    private void scheduleNextIconSpin() {
+        int delay = ThreadLocalRandom.current().nextInt(MIN_SPIN_DELAY_MS, MAX_SPIN_DELAY_MS + 1);
+        Timer timer = new Timer(delay, e -> startSpinAnimation());
+        timer.setRepeats(false);
+        timer.start();
+    }
+
+    private void startSpinAnimation() {
+        if (isSpinning || turtleIcons == null || loadedIconCount < 2) {
+            scheduleNextIconSpin();
+            return;
+        }
+
+        isSpinning = true;
+        final int[] completedSteps = {0};
+        final int stepsForFullSpin = loadedIconCount;
+
+        Timer animationTimer = new Timer(SPIN_FRAME_DELAY_MS, e -> {
+            if (!advanceToNextAvailableIcon()) {
+                ((Timer) e.getSource()).stop();
+                isSpinning = false;
+                scheduleNextIconSpin();
+                return;
+            }
+
+            completedSteps[0]++;
+            if (completedSteps[0] >= stepsForFullSpin) {
+                ((Timer) e.getSource()).stop();
+                isSpinning = false;
+                scheduleNextIconSpin();
+            }
+        });
+        animationTimer.start();
+    }
+
+    private boolean advanceToNextAvailableIcon() {
+        if (turtleIcons == null || turtleIcons.length == 0) {
+            return false;
+        }
+
+        for (int i = 0; i < turtleIcons.length; i++) {
+            currentIconIndex = (currentIconIndex + 1) % turtleIcons.length;
+            if (turtleIcons[currentIconIndex] != null) {
+                setIconImage(turtleIcons[currentIconIndex]);
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private static DrawSelection readSelection(String[] args) {
