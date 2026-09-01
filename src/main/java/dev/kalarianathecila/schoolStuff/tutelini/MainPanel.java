@@ -17,6 +17,7 @@ public class MainPanel extends Panel {
     }
 
     private Turtle tutel = null;
+    private Graphics2D canvas = null;
     private final int scale;
     private final DrawingTarget drawingTarget;
 
@@ -38,6 +39,7 @@ public class MainPanel extends Panel {
         super.paint(g);
 
         this.tutel = new Turtle(this, g);
+        this.canvas = g instanceof Graphics2D ? (Graphics2D) g : null;
         switch (drawingTarget) {
             case TREE:
                 drawTree(scale);
@@ -142,88 +144,106 @@ public class MainPanel extends Panel {
     }
 
     public void drawKochSnowflake(int inputLevels) {
+        if (canvas == null) {
+            return;
+        }
+
         int levels = clampLevel(inputLevels, MAX_KOCH_LEVELS);
         double size = Math.min(getWidth(), getHeight()) * 0.35;
         if (size < 80) {
             size = 220;
         }
 
-        tutel.homePosition();
-        tutel.stopDraw();
-        tutel.back((int) Math.round(size / 2.0));
-        tutel.turnRight(90);
-        tutel.move(size / 3.0);
-        tutel.turnLeft(90);
-        tutel.startDraw();
+        double centerX = getWidth() / 2.0;
+        double centerY = getHeight() / 2.0;
+        double triHeight = size * Math.sqrt(3.0) / 2.0;
 
-        for (int i = 0; i < 3; i++) {
-            drawKochSegment(levels, size);
-            tutel.turnRight(120);
-        }
+        double ax = centerX - (size / 2.0);
+        double ay = centerY + (triHeight / 3.0);
+        double bx = centerX + (size / 2.0);
+        double by = ay;
+        double cx = centerX;
+        double cy = centerY - (2.0 * triHeight / 3.0);
+
+        drawKochEdge(levels, ax, ay, bx, by);
+        drawKochEdge(levels, bx, by, cx, cy);
+        drawKochEdge(levels, cx, cy, ax, ay);
     }
 
-    private void drawKochSegment(int level, double length) {
+    private void drawKochEdge(int level, double x1, double y1, double x5, double y5) {
         if (level <= 1) {
-            tutel.move(length);
+            drawLine(x1, y1, x5, y5);
             return;
         }
 
-        double third = length / 3.0;
-        drawKochSegment(level - 1, third);
-        tutel.turnLeft(60);
-        drawKochSegment(level - 1, third);
-        tutel.turnRight(120);
-        drawKochSegment(level - 1, third);
-        tutel.turnLeft(60);
-        drawKochSegment(level - 1, third);
+        double dx = (x5 - x1) / 3.0;
+        double dy = (y5 - y1) / 3.0;
+
+        double x2 = x1 + dx;
+        double y2 = y1 + dy;
+        double x4 = x1 + 2.0 * dx;
+        double y4 = y1 + 2.0 * dy;
+
+        // Rotate by -60 degrees to put the bump outside the base triangle.
+        double cos60 = 0.5;
+        double sin60 = Math.sqrt(3.0) / 2.0;
+        double vx = x4 - x2;
+        double vy = y4 - y2;
+        double x3 = x2 + (vx * cos60 + vy * sin60);
+        double y3 = y2 + (-vx * sin60 + vy * cos60);
+
+        drawKochEdge(level - 1, x1, y1, x2, y2);
+        drawKochEdge(level - 1, x2, y2, x3, y3);
+        drawKochEdge(level - 1, x3, y3, x4, y4);
+        drawKochEdge(level - 1, x4, y4, x5, y5);
     }
 
     public void drawSierpinskiTriangle(int inputLevels) {
+        if (canvas == null) {
+            return;
+        }
+
         int levels = clampLevel(inputLevels, MAX_SIERPINSKI_LEVELS);
         double size = Math.min(getWidth(), getHeight()) * 0.6;
         if (size < 100) {
             size = 260;
         }
 
-        tutel.homePosition();
-        tutel.stopDraw();
-        tutel.back((int) Math.round(size / 2.0));
-        tutel.turnRight(90);
-        tutel.move(size / 3.0);
-        tutel.turnLeft(90);
-        tutel.startDraw();
+        double centerX = getWidth() / 2.0;
+        double centerY = getHeight() / 2.0;
+        double triHeight = size * Math.sqrt(3.0) / 2.0;
 
-        drawSierpinskiRecursive(levels, size);
+        double ax = centerX;
+        double ay = centerY - (2.0 * triHeight / 3.0);
+        double bx = centerX - (size / 2.0);
+        double by = centerY + (triHeight / 3.0);
+        double cx = centerX + (size / 2.0);
+        double cy = by;
+
+        drawSierpinskiRecursive(levels, ax, ay, bx, by, cx, cy);
     }
 
-    private void drawSierpinskiRecursive(int level, double length) {
+    private void drawSierpinskiRecursive(int level,
+                                         double ax, double ay,
+                                         double bx, double by,
+                                         double cx, double cy) {
         if (level <= 1) {
-            drawTriangle(length);
+            drawLine(ax, ay, bx, by);
+            drawLine(bx, by, cx, cy);
+            drawLine(cx, cy, ax, ay);
             return;
         }
 
-        double half = length / 2.0;
+        double abx = (ax + bx) / 2.0;
+        double aby = (ay + by) / 2.0;
+        double bcx = (bx + cx) / 2.0;
+        double bcy = (by + cy) / 2.0;
+        double cax = (cx + ax) / 2.0;
+        double cay = (cy + ay) / 2.0;
 
-        drawSierpinskiRecursive(level - 1, half);
-
-        tutel.move(half);
-        drawSierpinskiRecursive(level - 1, half);
-        tutel.back((int) Math.round(half));
-
-        tutel.turnLeft(60);
-        tutel.move(half);
-        tutel.turnRight(60);
-        drawSierpinskiRecursive(level - 1, half);
-        tutel.turnRight(60);
-        tutel.back((int) Math.round(half));
-        tutel.turnLeft(60);
-    }
-
-    private void drawTriangle(double length) {
-        for (int i = 0; i < 3; i++) {
-            tutel.move(length);
-            tutel.turnLeft(120);
-        }
+        drawSierpinskiRecursive(level - 1, ax, ay, abx, aby, cax, cay);
+        drawSierpinskiRecursive(level - 1, abx, aby, bx, by, bcx, bcy);
+        drawSierpinskiRecursive(level - 1, cax, cay, bcx, bcy, cx, cy);
     }
 
     public void drawDragonCurve(int inputLevels) {
@@ -235,7 +255,9 @@ public class MainPanel extends Panel {
 
         tutel.homePosition();
         tutel.stopDraw();
-        tutel.back((int) Math.round(size / 2.0));
+        tutel.turnLeft(180);
+        tutel.move(size / 2.0);
+        tutel.turnRight(180);
         tutel.startDraw();
 
         drawDragonRecursive(levels, size, 1);
@@ -259,5 +281,18 @@ public class MainPanel extends Panel {
 
     private int clampLevel(int input, int maxLevel) {
         return Math.min(maxLevel, Math.max(1, input));
+    }
+
+    private void drawLine(double x1, double y1, double x2, double y2) {
+        if (canvas == null) {
+            return;
+        }
+
+        canvas.drawLine(
+                (int) Math.round(x1),
+                (int) Math.round(y1),
+                (int) Math.round(x2),
+                (int) Math.round(y2)
+        );
     }
 }
