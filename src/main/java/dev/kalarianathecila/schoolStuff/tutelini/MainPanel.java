@@ -4,13 +4,20 @@ import java.awt.*;
 
 public class MainPanel extends Panel {
     private static final int MAX_TREE_LEVELS = 12;
+    private static final int MAX_Y_TREE_LEVELS = 12;
     private static final int MAX_KOCH_LEVELS = 6;
     private static final int MAX_SIERPINSKI_LEVELS = 7;
     private static final int MAX_DRAGON_LEVELS = 16;
 
+    private static final double BINARY_BRANCH_ANGLE = 30.0;
+    private static final double BINARY_BRANCH_SCALE = 0.7;
+    private static final double Y_BRANCH_ANGLE = 35.0;
+    private static final double Y_BRANCH_SCALE = 0.72;
+
     public enum DrawingTarget {
         HOUSE,
         TREE,
+        Y_TREE,
         KOCH_SNOWFLAKE,
         SIERPINSKI_TRIANGLE,
         DRAGON_CURVE
@@ -43,6 +50,9 @@ public class MainPanel extends Panel {
         switch (drawingTarget) {
             case TREE:
                 drawTree(scale);
+                break;
+            case Y_TREE:
+                drawYTree(scale);
                 break;
             case KOCH_SNOWFLAKE:
                 drawKochSnowflake(scale);
@@ -95,12 +105,26 @@ public class MainPanel extends Panel {
 
     public void drawTree(int inputScale) {
         int levels = clampLevel(inputScale, MAX_TREE_LEVELS);
+        int trunkLength = moveToTreeStartAndDrawTrunk();
+        double firstBranchLength = Math.max(35, trunkLength * (2.0 / 3.0));
 
+        // Binary tree: each branch splits into two branches.
+        drawBranchPair(firstBranchLength, levels - 1, BINARY_BRANCH_ANGLE, BINARY_BRANCH_SCALE);
+    }
+
+    public void drawYTree(int inputLevels) {
+        int levels = clampLevel(inputLevels, MAX_Y_TREE_LEVELS);
+        int trunkLength = moveToTreeStartAndDrawTrunk();
+        double firstBranchLength = Math.max(40, trunkLength * 0.75);
+
+        // Y-tree: broader split angle and slightly slower shrink factor.
+        drawBranchPair(firstBranchLength, levels - 1, Y_BRANCH_ANGLE, Y_BRANCH_SCALE);
+    }
+
+    private int moveToTreeStartAndDrawTrunk() {
         int panelHeight = Math.max(200, getHeight());
         int bottomMargin = 40;
-
         int trunkLength = Math.max(60, panelHeight / 4);
-        int baseBranchLength = Math.max(35, trunkLength * 2 / 3);
 
         tutel.homePosition();
 
@@ -111,36 +135,33 @@ public class MainPanel extends Panel {
         tutel.turnLeft(180);
         tutel.startDraw();
 
-        // Draw trunk.
         tutel.move(trunkLength);
-
-        // Base split is always drawn; extra levels recurse from branch tips.
-        drawTreeSplit(baseBranchLength, levels - 1);
+        return trunkLength;
     }
 
-    private void drawTreeSplit(double branchLength, int extraLevels) {
+    private void drawBranchPair(double branchLength, int extraLevels, double branchAngle, double shrinkFactor) {
         if (branchLength < 6) {
             return;
         }
 
-        // Left branch (+30 deg from vertical).
-        tutel.turnLeft(30);
+        // Left branch from current heading.
+        tutel.turnLeft(branchAngle);
         tutel.move(branchLength);
         if (extraLevels > 0) {
-            drawTreeSplit(branchLength * 0.7, extraLevels - 1);
+            drawBranchPair(branchLength * shrinkFactor, extraLevels - 1, branchAngle, shrinkFactor);
         }
         tutel.back((int) Math.round(branchLength));
 
-        // Right branch (-30 deg from vertical), so both branches are 60 deg apart.
-        tutel.turnRight(60);
+        // Right branch mirrored across the parent direction.
+        tutel.turnRight(branchAngle * 2.0);
         tutel.move(branchLength);
         if (extraLevels > 0) {
-            drawTreeSplit(branchLength * 0.7, extraLevels - 1);
+            drawBranchPair(branchLength * shrinkFactor, extraLevels - 1, branchAngle, shrinkFactor);
         }
         tutel.back((int) Math.round(branchLength));
 
         // Restore original heading before returning.
-        tutel.turnLeft(30);
+        tutel.turnLeft(branchAngle);
     }
 
     public void drawKochSnowflake(int inputLevels) {

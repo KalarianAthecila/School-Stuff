@@ -130,6 +130,7 @@ public class Draw extends JFrame {
         JTextField scaleField = new JTextField(String.valueOf(argScale != null ? argScale : 1), 8);
         JCheckBox houseCheck = new JCheckBox("House (value = scale)", argTarget == MainPanel.DrawingTarget.HOUSE);
         JCheckBox treeCheck = new JCheckBox("Tree (value = levels)", argTarget == MainPanel.DrawingTarget.TREE);
+        JCheckBox yTreeCheck = new JCheckBox("Y-Tree (value = levels)", argTarget == MainPanel.DrawingTarget.Y_TREE);
         JCheckBox kochCheck = new JCheckBox("Koch Snowflake (value = levels)", argTarget == MainPanel.DrawingTarget.KOCH_SNOWFLAKE);
         JCheckBox sierpinskiCheck = new JCheckBox("Sierpinski Triangle (value = levels)", argTarget == MainPanel.DrawingTarget.SIERPINSKI_TRIANGLE);
         JCheckBox dragonCheck = new JCheckBox("Dragon Curve (value = levels)", argTarget == MainPanel.DrawingTarget.DRAGON_CURVE);
@@ -137,6 +138,7 @@ public class Draw extends JFrame {
         ButtonGroup group = new ButtonGroup();
         group.add(houseCheck);
         group.add(treeCheck);
+        group.add(yTreeCheck);
         group.add(kochCheck);
         group.add(sierpinskiCheck);
         group.add(dragonCheck);
@@ -148,6 +150,7 @@ public class Draw extends JFrame {
         JPanel fractalPanel = new JPanel(new GridLayout(0, 1, 0, 4));
         fractalPanel.setBorder(BorderFactory.createTitledBorder("Fractals"));
         fractalPanel.add(treeCheck);
+        fractalPanel.add(yTreeCheck);
         fractalPanel.add(kochCheck);
         fractalPanel.add(sierpinskiCheck);
         fractalPanel.add(dragonCheck);
@@ -155,7 +158,7 @@ public class Draw extends JFrame {
         JPanel panel = new JPanel(new GridLayout(0, 1, 0, 6));
         panel.add(new JLabel("Enter value (positive integer):"));
         panel.add(scaleField);
-        panel.add(new JLabel("Fractals use level caps for stability (tree 12, koch 6, sierpinski 7, dragon 16)."));
+        panel.add(new JLabel("Fractals use level caps for stability (tree 12, y-tree 12, koch 6, sierpinski 7, dragon 16)."));
         panel.add(new JLabel("Apply value to:"));
         panel.add(standardPanel);
         panel.add(fractalPanel);
@@ -186,6 +189,8 @@ public class Draw extends JFrame {
 
             MainPanel.DrawingTarget target = treeCheck.isSelected()
                     ? MainPanel.DrawingTarget.TREE
+                    : yTreeCheck.isSelected()
+                    ? MainPanel.DrawingTarget.Y_TREE
                     : kochCheck.isSelected()
                     ? MainPanel.DrawingTarget.KOCH_SNOWFLAKE
                     : sierpinskiCheck.isSelected()
@@ -219,6 +224,9 @@ public class Draw extends JFrame {
         String normalized = value.trim().toLowerCase();
         if ("tree".equals(normalized)) {
             return MainPanel.DrawingTarget.TREE;
+        }
+        if ("y-tree".equals(normalized) || "ytree".equals(normalized) || "y_tree".equals(normalized)) {
+            return MainPanel.DrawingTarget.Y_TREE;
         }
         if ("koch".equals(normalized) || "snowflake".equals(normalized) || "koch_snowflake".equals(normalized)) {
             return MainPanel.DrawingTarget.KOCH_SNOWFLAKE;
