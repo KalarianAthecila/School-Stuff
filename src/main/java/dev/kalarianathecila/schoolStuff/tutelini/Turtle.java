@@ -66,7 +66,7 @@ class Turtle
 
   }
 
-  public void back(int length){
+  public void back(double length){
       turnLeft(180);
       stopDraw();
       move(length);
