@@ -13,6 +13,10 @@ public class MainPanel extends Panel {
     private static final double BINARY_BRANCH_SCALE = 0.7;
     private static final double Y_BRANCH_ANGLE = 35.0;
     private static final double Y_BRANCH_SCALE = 0.72;
+    private static final double MIN_BRANCH_ANGLE = 1.0;
+    private static final double MAX_BRANCH_ANGLE = 89.0;
+    private static final double MIN_LENGTH_MULTIPLIER = 0.2;
+    private static final double MAX_LENGTH_MULTIPLIER = 3.0;
 
     public enum DrawingTarget {
         HOUSE,
@@ -27,6 +31,8 @@ public class MainPanel extends Panel {
     private Graphics2D canvas = null;
     private final int scale;
     private final DrawingTarget drawingTarget;
+    private double treeAngleOffset = 0.0;
+    private double treeLengthMultiplier = 1.0;
 
     public MainPanel() {
         this(1, DrawingTarget.HOUSE);
@@ -105,27 +111,29 @@ public class MainPanel extends Panel {
 
     public void drawTree(int inputScale) {
         int levels = clampLevel(inputScale, MAX_TREE_LEVELS);
-        double trunkLength = moveToTreeStartAndDrawTrunk();
+        double trunkLength = moveToTreeStartAndDrawTrunk(treeLengthMultiplier);
         double firstBranchLength = Math.max(35.0, trunkLength * (2.0 / 3.0));
+        double branchAngle = clampDouble(BINARY_BRANCH_ANGLE + treeAngleOffset, MIN_BRANCH_ANGLE, MAX_BRANCH_ANGLE);
 
         // Binary tree: each branch splits into two branches.
-        drawBranchPair(firstBranchLength, levels - 1, BINARY_BRANCH_ANGLE, BINARY_BRANCH_SCALE);
+        drawBranchPair(firstBranchLength, levels - 1, branchAngle, BINARY_BRANCH_SCALE);
     }
 
     public void drawYTree(int inputLevels) {
         int levels = clampLevel(inputLevels, MAX_Y_TREE_LEVELS);
-        double trunkLength = moveToTreeStartAndDrawTrunk();
+        double trunkLength = moveToTreeStartAndDrawTrunk(treeLengthMultiplier);
         double firstBranchLength = Math.max(35.0, trunkLength * 0.55);
         double firstStemLength = Math.max(30.0, trunkLength * 0.55);
+        double branchAngle = clampDouble(Y_BRANCH_ANGLE + treeAngleOffset, MIN_BRANCH_ANGLE, MAX_BRANCH_ANGLE);
 
         // Y-tree: each split creates two arms, and each arm grows a vertical stem before the next split.
-        drawYTreeNode(firstBranchLength, firstStemLength, levels - 1);
+        drawYTreeNode(firstBranchLength, firstStemLength, branchAngle, levels - 1);
     }
 
-    private double moveToTreeStartAndDrawTrunk() {
+    private double moveToTreeStartAndDrawTrunk(double lengthMultiplier) {
         double panelHeight = Math.max(200.0, getHeight());
         double bottomMargin = 40.0;
-        double trunkLength = Math.max(60.0, panelHeight / 4.0);
+        double trunkLength = Math.max(60.0, (panelHeight / 4.0) * lengthMultiplier);
 
         tutel.homePosition();
 
@@ -165,41 +173,59 @@ public class MainPanel extends Panel {
         tutel.turnLeft(branchAngle);
     }
 
-    private void drawYTreeNode(double branchLength, double stemLength, int extraLevels) {
+    private void drawYTreeNode(double branchLength, double stemLength, double branchAngle, int extraLevels) {
         if (branchLength < 6.0 || stemLength < 6.0 || extraLevels < 0) {
             return;
         }
 
         // Left arm from current split point.
-        tutel.turnLeft(Y_BRANCH_ANGLE);
+        tutel.turnLeft(branchAngle);
         tutel.move(branchLength);
 
         // Re-align to global up before drawing the next stem.
-        tutel.turnRight(Y_BRANCH_ANGLE);
+        tutel.turnRight(branchAngle);
         tutel.move(stemLength);
         if (extraLevels > 0) {
-            drawYTreeNode(branchLength * Y_BRANCH_SCALE, stemLength * Y_BRANCH_SCALE, extraLevels - 1);
+            drawYTreeNode(branchLength * Y_BRANCH_SCALE, stemLength * Y_BRANCH_SCALE, branchAngle, extraLevels - 1);
         }
         tutel.back(stemLength);
-        tutel.turnLeft(Y_BRANCH_ANGLE);
+        tutel.turnLeft(branchAngle);
         tutel.back(branchLength);
 
         // Right arm mirrors the left arm from the same split point.
-        tutel.turnRight(Y_BRANCH_ANGLE * 2.0);
+        tutel.turnRight(branchAngle * 2.0);
         tutel.move(branchLength);
 
         // Re-align to global up before drawing the next stem.
-        tutel.turnLeft(Y_BRANCH_ANGLE);
+        tutel.turnLeft(branchAngle);
         tutel.move(stemLength);
         if (extraLevels > 0) {
-            drawYTreeNode(branchLength * Y_BRANCH_SCALE, stemLength * Y_BRANCH_SCALE, extraLevels - 1);
+            drawYTreeNode(branchLength * Y_BRANCH_SCALE, stemLength * Y_BRANCH_SCALE, branchAngle, extraLevels - 1);
         }
         tutel.back(stemLength);
-        tutel.turnRight(Y_BRANCH_ANGLE);
+        tutel.turnRight(branchAngle);
         tutel.back(branchLength);
 
         // Restore original heading before returning.
-        tutel.turnLeft(Y_BRANCH_ANGLE);
+        tutel.turnLeft(branchAngle);
+    }
+
+    public void adjustTreeAngle(double deltaDegrees) {
+        treeAngleOffset = clampDouble(treeAngleOffset + deltaDegrees, -45.0, 45.0);
+        repaint();
+    }
+
+    public void adjustTreeLengthMultiplier(double delta) {
+        treeLengthMultiplier = clampDouble(treeLengthMultiplier + delta, MIN_LENGTH_MULTIPLIER, MAX_LENGTH_MULTIPLIER);
+        repaint();
+    }
+
+    public double getTreeAngleOffset() {
+        return treeAngleOffset;
+    }
+
+    public double getTreeLengthMultiplier() {
+        return treeLengthMultiplier;
     }
 
     public void drawKochSnowflake(int inputLevels) {
@@ -340,6 +366,10 @@ public class MainPanel extends Panel {
 
     private int clampLevel(int input, int maxLevel) {
         return Math.min(maxLevel, Math.max(1, input));
+    }
+
+    private double clampDouble(double value, double minValue, double maxValue) {
+        return Math.max(minValue, Math.min(maxValue, value));
     }
 
     private void drawLine(double x1, double y1, double x2, double y2) {

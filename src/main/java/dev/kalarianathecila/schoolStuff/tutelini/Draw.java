@@ -10,6 +10,8 @@ public class Draw extends JFrame {
     private static final int MIN_SPIN_DELAY_MS = 20_000;
     private static final int MAX_SPIN_DELAY_MS = 60_000;
     private static final int SPIN_FRAME_DELAY_MS = 180;
+    private static final double ANGLE_STEP_DEGREES = 1.0;
+    private static final double LENGTH_STEP = 0.05;
     private static final String[] TURTLE_ICON_PATHS = {
             "/dev/kalarianathecila/schoolStuff/tutelini/tutel.png",
             "/dev/kalarianathecila/schoolStuff/tutelini/tutel_90.png",
@@ -34,10 +36,64 @@ public class Draw extends JFrame {
 
             app.initializeIconRotation();
 
-            app.add(new MainPanel(selection.scale, selection.target));
+            MainPanel mainPanel = new MainPanel(selection.scale, selection.target);
+            app.add(mainPanel);
+            app.installTreeControls(mainPanel);
             app.setVisible(true);
+            app.refreshTreeControlTitle(mainPanel);
             app.scheduleNextIconSpin();
         });
+    }
+
+    private void installTreeControls(MainPanel mainPanel) {
+        JRootPane rootPane = getRootPane();
+        InputMap inputMap = rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+        ActionMap actionMap = rootPane.getActionMap();
+
+        inputMap.put(KeyStroke.getKeyStroke("LEFT"), "tree-angle-dec");
+        inputMap.put(KeyStroke.getKeyStroke("RIGHT"), "tree-angle-inc");
+        inputMap.put(KeyStroke.getKeyStroke("UP"), "tree-length-inc");
+        inputMap.put(KeyStroke.getKeyStroke("DOWN"), "tree-length-dec");
+
+        actionMap.put("tree-angle-dec", new AbstractAction() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                mainPanel.adjustTreeAngle(-ANGLE_STEP_DEGREES);
+                refreshTreeControlTitle(mainPanel);
+            }
+        });
+
+        actionMap.put("tree-angle-inc", new AbstractAction() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                mainPanel.adjustTreeAngle(ANGLE_STEP_DEGREES);
+                refreshTreeControlTitle(mainPanel);
+            }
+        });
+
+        actionMap.put("tree-length-inc", new AbstractAction() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                mainPanel.adjustTreeLengthMultiplier(LENGTH_STEP);
+                refreshTreeControlTitle(mainPanel);
+            }
+        });
+
+        actionMap.put("tree-length-dec", new AbstractAction() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                mainPanel.adjustTreeLengthMultiplier(-LENGTH_STEP);
+                refreshTreeControlTitle(mainPanel);
+            }
+        });
+    }
+
+    private void refreshTreeControlTitle(MainPanel mainPanel) {
+        setTitle(String.format(
+                "Draw | <-/-> angle: %.1f deg | Up/Down length: %.2fx",
+                mainPanel.getTreeAngleOffset(),
+                mainPanel.getTreeLengthMultiplier()
+        ));
     }
 
     private void initializeIconRotation() {
